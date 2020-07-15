@@ -1,0 +1,15 @@
+.DS_Store
+dist/electron/*
+dist/web/*
+build/*
+!build/icons
+node_modules/
+npm-debug.log
+npm-debug.log.*
+thumbs.db
+!.gitkeep
+.idea
+.idea/*
+*.iml
+set http_proxy=http://127.0.0.1:8888
+set https_proxy=http://127.0.0.1:8888

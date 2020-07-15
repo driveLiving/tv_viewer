@@ -1,0 +1,168 @@
+<template style="margin: 0px;">
+  <el-container style="height: 100%; border: 1px solid #eee">
+    <el-aside width="210px" style="background-color: rgb(238, 241, 246)">
+<!--      <el-menu  :default-openeds="['1']" >-->
+<!--        <h3 style="margin-left: 20px;" @click="reloadList">节目列表</h3>-->
+<!--        <el-submenu :index="Math.random()+''"  v-for="(item,i) in playerList">-->
+<!--          <template slot="title"><i class="el-icon-menu"></i>{{item.groupName}}</template>-->
+<!--          <el-menu-item-group>-->
+<!--            <template slot="title">{{i+''}}</template>-->
+<!--            <el-menu-item :index="Math.random()+''" @click="playOne(jtem.url)" :data-url="jtem.url" v-for="(jtem,j) in item.list">{{jtem.name}}</el-menu-item>-->
+<!--          </el-menu-item-group>-->
+<!--        </el-submenu>-->
+<!--      </el-menu>-->
+      <el-menu class="el-menu-vertical-demo"  :unique-opened="true">
+        <h3 style="margin-left: 25px;" @click="reloadList">节目列表</h3>
+        <el-submenu :index="(i+1)+''" v-for="(item,i) in playerList">
+          <template slot="title">
+            <i class="el-icon-location"></i>
+            <span slot="title">{{item.groupName}}</span>
+          </template>
+          <el-menu-item-group>
+            <span slot="title"></span>
+            <el-menu-item :index="i+'-'+j" @click="playOne(jtem.url)" v-for="(jtem,j) in item.list">{{jtem.name}}</el-menu-item>
+          </el-menu-item-group>
+        </el-submenu>
+      </el-menu>
+    </el-aside>
+
+    <el-container>
+      <el-main  v-loading="loading">
+        <section>
+<!--          <video style="width: 100%;" ref="video" controls></video>-->
+          <d-player ref="player" style="width: 100%;height: 100%;" :options="options"></d-player>
+        </section>
+      </el-main>
+    </el-container>
+  </el-container>
+</template>
+
+<script>
+  let Hls = require('hls.js');
+  import TitleBar from "./components/TitleBar.vue"
+  import SideBar from "./components/SideBar.vue"
+  import dPlayer from 'vue-dplayer'
+  import 'vue-dplayer/dist/vue-dplayer.css'
+
+
+
+  export default {
+    components: {
+      TitleBar,
+      SideBar,
+      dPlayer
+    },
+    props: {
+      source: {
+        type: String,
+        default: ''
+      }
+    },
+    data() {
+      const item = {
+        date: '2016-05-02',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1518 弄'
+      };
+      return {
+        player: null,
+        options: {
+          video: {
+            url: ''
+          },
+          contextmenu: [
+            {}
+          ]
+        },
+        loading:false,
+        hls: '',
+        tableData: Array(20).fill(item),
+        playerList:[
+          {
+            groupName:"央视",
+            list:[
+              {name:"CCTV1",url:"http://144.48.240.144:2019/SunTv.php?name=CCTV1HD"},
+              {name:"CCTV2",url:"http://144.48.240.144:2019/SunTv.php?name=CCTV2HD"}
+            ]
+          },
+          {
+            groupName:"卫视",
+            list:[
+              {name:"安徽卫视",url:"http://101.71.255.229:6610/zjhs/2/10002/index.m3u8?virtualDomain=zjhs.live_hls.zte.com"},
+              {name:"北京卫视",url:"http://101.71.255.229:6610/zjhs/2/10005/index.m3u8?virtualDomain=zjhs.live_hls.zte.com"}
+            ]
+          }
+        ]
+
+
+      }
+    },
+    mounted() {
+      this.reloadList();
+      this.player = this.$refs.player.dp
+
+    },
+    methods: {
+      reloadList(){
+        let thiz = this;
+        this.$axios.get('http://dd.laigc.com:10080/linsongze/tv/raw/branch/master/m.txt?xxx='+Math.random()).then(res => {
+          let content = res.data;
+          let list = content.split("\n");
+          list = list.filter(s=>s.trim().length>0)
+          let rs = []
+          let groupName = null;
+          let group = {}
+          for (let line of list){
+              line = line.trim();
+              if(line.includes("#genre#")){//新分组
+                  groupName = line.split(",")[0];
+                  group={groupName:groupName,list:[]}
+                  rs.push(group)
+              }else{
+                  if(groupName == null)continue;
+                  if(!line.includes(",")){continue;};
+                  let ss=line.split(',');
+                  group.list.push({name:ss[0],url:ss[1]})
+
+              }
+          }
+          console.log(rs);
+          thiz.playerList = rs;
+        });
+      },
+      playOne (url) {
+        this.getStream(url);
+
+      },
+      getStream(source) {
+        this.player.switchVideo({
+          url: source
+        })
+        this.player.play();
+
+      }
+
+    },
+  };
+</script>
+
+<style>
+  .el-header {
+    background-color: #B3C0D1;
+    color: #333;
+    line-height: 50px;
+  }
+  .el-main{
+    padding: 0px;
+  }
+  .el-menu-vertical-demo:not(.el-menu--collapse) {
+    width: 200px;
+    min-height: 400px;
+      height: 100%;
+  }
+  .el-aside {
+    color: #333;
+  }
+  html,body{margin:0;padding:0;height: 100%;}
+
+</style>
