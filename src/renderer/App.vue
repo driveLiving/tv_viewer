@@ -12,7 +12,7 @@
 <!--        </el-submenu>-->
 <!--      </el-menu>-->
       <el-menu class="el-menu-vertical-demo"  :unique-opened="true">
-        <h3 style="margin-left: 25px;" @click="reloadList">节目列表</h3>
+        <h3 style="margin-left: 25px;" @click="reloadList(null)">节目列表</h3>
         <el-submenu :index="(i+1)+''" v-for="(item,i) in playerList">
           <template slot="title">
             <i class="el-icon-location"></i>
@@ -43,6 +43,9 @@
   import SideBar from "./components/SideBar.vue"
   import dPlayer from 'vue-dplayer'
   import 'vue-dplayer/dist/vue-dplayer.css'
+  const ipcRenderer = require('electron').ipcRenderer;
+  const fs = require('fs');
+
 
 
 
@@ -98,37 +101,75 @@
       }
     },
     mounted() {
-      this.reloadList();
+      this.reloadList(null);
       this.player = this.$refs.player.dp
 
+
+
+      //触发输入框
+      const thiz = this;
+      ipcRenderer.on('selectedFile', function (event, message) {
+        const path = message.path[0];
+        const data = fs.readFileSync(path, 'utf-8');
+        thiz.loadData(data);
+      });
+
+      ipcRenderer.on('toInputUrl', function (event, message) {
+        console.log(111);
+        thiz.$prompt('请输入在线源', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消'
+        }).then(({ value }) => {
+            if(!value.startsWith("http")){
+              return;
+            }
+            thiz.reloadList(value);
+
+        }).catch(() => {
+
+        });
+      });
     },
     methods: {
-      reloadList(){
+      reloadList(url){
         let thiz = this;
-        this.$axios.get('http://dd.laigc.com:10080/linsongze/tv/raw/branch/master/m.txt?xxx='+Math.random()).then(res => {
-          let content = res.data;
-          let list = content.split("\n");
-          list = list.filter(s=>s.trim().length>0)
-          let rs = []
-          let groupName = null;
-          let group = {}
-          for (let line of list){
-              line = line.trim();
-              if(line.includes("#genre#")){//新分组
-                  groupName = line.split(",")[0];
-                  group={groupName:groupName,list:[]}
-                  rs.push(group)
-              }else{
-                  if(groupName == null)continue;
-                  if(!line.includes(",")){continue;};
-                  let ss=line.split(',');
-                  group.list.push({name:ss[0],url:ss[1]})
+        if(url == null){
+          url = 'http://dd.laigc.com:10080/linsongze/tv/raw/branch/master/m.txt?xxx='+Math.random();
+        }else{
+            if(url.includes("?")){
+              url = url+'&xxx='+Math.random();
+            }else{
+              url=url+'?xxx='+Math.random();
+            }
 
-              }
-          }
-          console.log(rs);
-          thiz.playerList = rs;
+        }
+        this.$axios.get(url).then(res => {
+          let content = res.data;
+          thiz.loadData(content);
         });
+      },
+      loadData(content){
+        let list = content.split("\n");
+        list = list.filter(s=>s.trim().length>0)
+        let rs = []
+        let groupName = null;
+        let group = {}
+        for (let line of list){
+          line = line.trim();
+          if(line.includes("#genre#")){//新分组
+            groupName = line.split(",")[0];
+            group={groupName:groupName,list:[]}
+            rs.push(group)
+          }else{
+            if(groupName == null)continue;
+            if(!line.includes(",")){continue;};
+            let ss=line.split(',');
+            group.list.push({name:ss[0],url:ss[1]})
+
+          }
+        }
+        console.log(rs);
+        this.playerList = rs;
       },
       playOne (url) {
         this.getStream(url);

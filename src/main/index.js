@@ -1,4 +1,6 @@
 import { app,screen,Menu, BrowserWindow, ipcMain } from "electron"
+const ipcRenderer = require('electron').ipcRenderer;
+const {dialog} = require('electron');
 
 /**
  * Set `__static` path to static files in production
@@ -26,8 +28,10 @@ if (isSecondInstance) {
 
 
 
+let mainWindow;
 
-let mainWindow
+
+
 const winURL =
   process.env.NODE_ENV === "development"
     ? `http://localhost:9080`
@@ -47,8 +51,44 @@ function createWindow() {
     webPreferences: {
       webSecurity: false
     }
-  })
-  Menu.setApplicationMenu(null);
+  });
+
+  let application_menu = [
+    {
+      label: '直播源',
+      submenu:[
+        {
+          label: '在线地址',
+          click: () =>{
+            mainWindow.webContents.send("toInputUrl",{});
+          }
+        },
+        {
+          label: '本地文件',
+          click: () =>{
+            let options = {
+              // See place holder 1 in above image
+              title : "源文件",
+              // See place holder 3 in above image
+              buttonLabel : "打开",
+              // See place holder 4 in above image
+              filters :[
+                {name: '源文件', extensions: ['txt']}
+              ],
+              properties: ['openFile']
+            };
+            let filePath = dialog.showOpenDialog(mainWindow, options)
+            mainWindow.webContents.send("selectedFile",{path:filePath});
+
+
+          }
+        }
+      ]
+    }
+  ];
+
+  var menu = Menu.buildFromTemplate(application_menu);
+  Menu.setApplicationMenu(menu);
 
   mainWindow.loadURL(winURL)
   mainWindow.webContents.closeDevTools()
