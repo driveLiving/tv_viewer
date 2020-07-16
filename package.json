@@ -44,7 +44,8 @@
       ]
     },
     "mac": {
-      "icon": "build/icons/tv.icns"
+      "icon": "build/icons/tv.icns",
+      "target":"pkg"
     },
     "win": {
       "icon": "build/icons/tv.ico"
@@ -54,6 +55,7 @@
     }
   },
   "dependencies": {
+    "ajv": "^5.5.2",
     "axios": "^0.19.0",
     "dplayer": "^1.26.0",
     "electron-store": "^2.0.0",
