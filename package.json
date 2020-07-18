@@ -45,7 +45,7 @@
     },
     "mac": {
       "icon": "build/icons/tv.icns",
-      "target":"pkg"
+      "target": "pkg"
     },
     "win": {
       "icon": "build/icons/tv.ico"
@@ -64,11 +64,13 @@
     "fs": "^0.0.1-security",
     "hls": "0.0.1",
     "hls.js": "^0.14.1",
+    "iview": "^3.5.4",
     "vue": "^2.3.3",
     "vue-axios": "^2.1.5",
     "vue-devtools": "^5.1.3",
     "vue-dplayer": "0.0.10",
     "vue-electron": "^1.0.6",
+    "vue-js-modal": "^2.0.0-rc.6",
     "vue-router": "^2.5.3",
     "vuex": "^2.3.1"
   },

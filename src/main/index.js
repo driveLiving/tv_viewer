@@ -42,8 +42,8 @@ function createWindow() {
    * Initial window options
    */
   let size = screen.getPrimaryDisplay().workAreaSize
-  let sWidth=size.width;
-  let sHeight=size.height;
+  let sWidth=1215
+  let sHeight=533;
   mainWindow = new BrowserWindow({
     height: sHeight,
     width: sWidth,
@@ -81,6 +81,12 @@ function createWindow() {
             mainWindow.webContents.send("selectedFile",{path:filePath});
 
 
+          }
+        },
+        {
+          label: '直接输入',
+          click: () =>{
+            mainWindow.webContents.send("inputText",{});
           }
         }
       ]

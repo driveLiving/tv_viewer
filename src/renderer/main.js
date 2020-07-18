@@ -1,7 +1,7 @@
 import Vue from "vue"
-import ElementUI from "element-ui"
 
-import "element-ui/lib/theme-chalk/index.css"
+import iView from 'iview';
+import 'iview/dist/styles/iview.css';    // 使用 CSS
 import App from "./App.vue"
 import router from "./router"
 const { exec } = require("child_process")
@@ -11,7 +11,7 @@ import axios from 'axios'
 window.Hls = require('hls.js');
 
 Vue.prototype.$axios = axios
-Vue.use(ElementUI)
+Vue.use(iView);
 
 Vue.prototype.$startLoading = function(loadStr) {
   var loadingObject = this.$loading({

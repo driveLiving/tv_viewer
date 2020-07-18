@@ -1,46 +1,59 @@
 <template style="margin: 0px;">
-  <el-container style="height: 100%; border: 1px solid #eee">
-    <el-aside width="210px" style="background-color: rgb(238, 241, 246)">
-<!--      <el-menu  :default-openeds="['1']" >-->
-<!--        <h3 style="margin-left: 20px;" @click="reloadList">节目列表</h3>-->
-<!--        <el-submenu :index="Math.random()+''"  v-for="(item,i) in playerList">-->
-<!--          <template slot="title"><i class="el-icon-menu"></i>{{item.groupName}}</template>-->
+<!--  <el-container style="height: 100%; border: 1px solid #eee">-->
+<!--    <el-aside width="210px" style="background-color: rgb(238, 241, 246)">-->
+<!--      <el-menu class="el-menu-vertical-demo"  :unique-opened="true">-->
+<!--        <h3 style="margin-left: 25px;" @click="reloadList(null)">节目列表</h3>-->
+<!--        <el-submenu :index="(i+1)+''" v-for="(item,i) in playerList">-->
+<!--          <template slot="title">-->
+<!--            <i class="el-icon-location"></i>-->
+<!--            <span slot="title">{{item.groupName}}</span>-->
+<!--          </template>-->
 <!--          <el-menu-item-group>-->
-<!--            <template slot="title">{{i+''}}</template>-->
-<!--            <el-menu-item :index="Math.random()+''" @click="playOne(jtem.url)" :data-url="jtem.url" v-for="(jtem,j) in item.list">{{jtem.name}}</el-menu-item>-->
+<!--            <span slot="title"></span>-->
+<!--            <el-menu-item :index="i+'-'+j" @click="playOne(jtem.url)" v-for="(jtem,j) in item.list">{{jtem.name}}</el-menu-item>-->
 <!--          </el-menu-item-group>-->
 <!--        </el-submenu>-->
 <!--      </el-menu>-->
-      <el-menu class="el-menu-vertical-demo"  :unique-opened="true">
-        <h3 style="margin-left: 25px;" @click="reloadList(null)">节目列表</h3>
-        <el-submenu :index="(i+1)+''" v-for="(item,i) in playerList">
-          <template slot="title">
-            <i class="el-icon-location"></i>
-            <span slot="title">{{item.groupName}}</span>
-          </template>
-          <el-menu-item-group>
-            <span slot="title"></span>
-            <el-menu-item :index="i+'-'+j" @click="playOne(jtem.url)" v-for="(jtem,j) in item.list">{{jtem.name}}</el-menu-item>
-          </el-menu-item-group>
-        </el-submenu>
-      </el-menu>
-    </el-aside>
+<!--    </el-aside>-->
 
-    <el-container>
-      <el-main  v-loading="loading">
-        <section>
-<!--          <video style="width: 100%;" ref="video" controls></video>-->
-          <d-player ref="player" style="width: 100%;height: 100%;" :options="options"></d-player>
-        </section>
-      </el-main>
-    </el-container>
-  </el-container>
+<!--    <el-container>-->
+<!--      <el-main  v-loading="loading">-->
+<!--        <section>-->
+<!--          <d-player ref="player" style="width: 100%;height: 100%;" :options="options"></d-player>-->
+<!--        </section>-->
+<!--      </el-main>-->
+<!--    </el-container>-->
+<!--  </el-container>-->
+
+
+    <div class="layout-content">
+        <Row>
+            <i-col span="5" >
+                <Menu width="auto" style="overflow-y:auto;">
+                    <Submenu :name="(i+1)+''" :key="(i+1)+''" v-for="(item,i) in playerList">
+                        <template slot="title">
+                            <Icon type="ios-navigate"></Icon>
+                            {{item.groupName}}
+                        </template>
+                        <Menu-item :name="i+'-'+j" :key="i+'-'+j"  @click.native="playOne(jtem.url)" v-for="(jtem,j) in item.list">{{jtem.name}}</Menu-item>
+                    </Submenu>
+
+                </Menu>
+            </i-col>
+
+            <i-col span="19">
+                <div class="layout-content-main">
+                            <section>
+                              <d-player ref="player" style="width: 100%;height: 100%;" :options="options"></d-player>
+                            </section>
+
+                </div>
+            </i-col>
+        </Row>
+    </div>
 </template>
-
 <script>
   let Hls = require('hls.js');
-  import TitleBar from "./components/TitleBar.vue"
-  import SideBar from "./components/SideBar.vue"
   import dPlayer from 'vue-dplayer'
   import 'vue-dplayer/dist/vue-dplayer.css'
   const ipcRenderer = require('electron').ipcRenderer;
@@ -51,8 +64,6 @@
 
   export default {
     components: {
-      TitleBar,
-      SideBar,
       dPlayer
     },
     props: {
@@ -62,12 +73,11 @@
       }
     },
     data() {
-      const item = {
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      };
+
       return {
+        form:{
+          name:""
+        },
         player: null,
         options: {
           video: {
@@ -79,7 +89,6 @@
         },
         loading:false,
         hls: '',
-        tableData: Array(20).fill(item),
         playerList:[
           {
             groupName:"央视",
@@ -108,6 +117,18 @@
 
       //触发输入框
       const thiz = this;
+      ipcRenderer.on('inputText', function (event, message) {
+        console.log(222);
+        const h = thiz.$createElement;
+        thiz.$message({
+          message: h('p', null, [
+            h('span', null, '内容可以是 '),
+            h('i', { style: 'color: teal' }, 'VNode')
+          ])
+        });
+
+      });
+
       ipcRenderer.on('selectedFile', function (event, message) {
         const path = message.path[0];
         const data = fs.readFileSync(path, 'utf-8');
@@ -172,6 +193,7 @@
         this.playerList = rs;
       },
       playOne (url) {
+        console.log(url);
         this.getStream(url);
 
       },
@@ -188,22 +210,7 @@
 </script>
 
 <style>
-  .el-header {
-    background-color: #B3C0D1;
-    color: #333;
-    line-height: 50px;
-  }
-  .el-main{
-    padding: 0px;
-  }
-  .el-menu-vertical-demo:not(.el-menu--collapse) {
-    width: 200px;
-    min-height: 400px;
-      height: 100%;
-  }
-  .el-aside {
-    color: #333;
-  }
+
   html,body{margin:0;padding:0;height: 100%;}
 
 </style>
