@@ -150,6 +150,7 @@
     },
     methods: {
       processM3u8Text(){
+        this.dialogVisible = false;
         var content = this.textContent.trim();
         if(!content||content.length == 0){
           return;
@@ -160,6 +161,7 @@
           content = "未分类,#genre#\n"+content;;
         }
         this.loadData(content);
+
       },
       reloadList(url){
         let thiz = this;
