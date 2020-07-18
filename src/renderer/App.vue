@@ -1,5 +1,7 @@
 <template style="margin: 0px;">
   <el-container style="height: 100%; border: 1px solid #eee">
+
+
     <el-aside width="210px" style="background-color: rgb(238, 241, 246)">
 <!--      <el-menu  :default-openeds="['1']" >-->
 <!--        <h3 style="margin-left: 20px;" @click="reloadList">节目列表</h3>-->
@@ -27,6 +29,25 @@
     </el-aside>
 
     <el-container>
+        <el-dialog
+                style="z-index:99999"
+                title="源文本"
+                :visible="dialogVisible"
+                width="70%"
+                :append-to-body="true"
+        center>
+            <el-input
+                    type="textarea"
+                    :autosize="{ minRows: 8, maxRows: 10}"
+                    placeholder="输入源(节目,链接)"
+                    v-model="textContent">
+            </el-input>
+
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="processM3u8Text">确 定</el-button>
+          </span>
+        </el-dialog>
       <el-main  v-loading="loading">
         <section>
 <!--          <video style="width: 100%;" ref="video" controls></video>-->
@@ -51,8 +72,6 @@
 
   export default {
     components: {
-      TitleBar,
-      SideBar,
       dPlayer
     },
     props: {
@@ -62,12 +81,9 @@
       }
     },
     data() {
-      const item = {
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      };
       return {
+        textContent:"",
+        dialogVisible:false,
         player: null,
         options: {
           video: {
@@ -79,7 +95,6 @@
         },
         loading:false,
         hls: '',
-        tableData: Array(20).fill(item),
         playerList:[
           {
             groupName:"央视",
@@ -114,6 +129,9 @@
         thiz.loadData(data);
       });
 
+      ipcRenderer.on('inputText', function (event, message) {
+        thiz.dialogVisible = true;
+      });
       ipcRenderer.on('toInputUrl', function (event, message) {
         console.log(111);
         thiz.$prompt('请输入在线源', '提示', {
@@ -131,6 +149,18 @@
       });
     },
     methods: {
+      processM3u8Text(){
+        var content = this.textContent.trim();
+        if(!content||content.length == 0){
+          return;
+        }
+        let list = content.split("\n");
+        let line = list[0];
+        if(!line.includes("#genre#")){
+          content = "未分类,#genre#\n"+content;;
+        }
+        this.loadData(content);
+      },
       reloadList(url){
         let thiz = this;
         if(url == null){

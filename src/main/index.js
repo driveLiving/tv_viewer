@@ -82,6 +82,12 @@ function createWindow() {
 
 
           }
+        },
+        {
+          label: '直接输入',
+          click: () =>{
+            mainWindow.webContents.send("inputText",{});
+          }
         }
       ]
     }
