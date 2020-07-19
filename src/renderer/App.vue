@@ -147,6 +147,22 @@
 
         });
       });
+      ipcRenderer.on('inputM3U8', function (event, message) {
+        console.log(111);
+        thiz.$prompt('请输入M3U8', 'm3u8', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消'
+        }).then(({ value }) => {
+          if(!value.startsWith("http")){
+            return;
+          }
+          console.log(value);
+          thiz.playOne(value);
+
+        }).catch(() => {
+
+        });
+      });
     },
     methods: {
       processM3u8Text(){

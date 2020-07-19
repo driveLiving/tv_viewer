@@ -84,9 +84,15 @@ function createWindow() {
           }
         },
         {
-          label: '直接输入',
+          label: '输入源文本',
           click: () =>{
             mainWindow.webContents.send("inputText",{});
+          }
+        },
+        {
+          label: '输入m3u8链接',
+          click: () =>{
+            mainWindow.webContents.send("inputM3U8",{});
           }
         }
       ]
