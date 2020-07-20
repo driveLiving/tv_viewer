@@ -2,7 +2,7 @@
   <el-container style="height: 100%; border: 1px solid #eee">
 
 
-    <el-aside width="210px" style="background-color: rgb(238, 241, 246)">
+    <el-aside width="210px">
 <!--      <el-menu  :default-openeds="['1']" >-->
 <!--        <h3 style="margin-left: 20px;" @click="reloadList">节目列表</h3>-->
 <!--        <el-submenu :index="Math.random()+''"  v-for="(item,i) in playerList">-->
@@ -18,11 +18,12 @@
         <el-submenu :index="(i+1)+''" v-for="(item,i) in playerList">
           <template slot="title">
             <i class="el-icon-location"></i>
+
             <span slot="title">{{item.groupName}}</span>
           </template>
           <el-menu-item-group>
             <span slot="title"></span>
-            <el-menu-item :index="i+'-'+j" @click="playOne(jtem.url)" v-for="(jtem,j) in item.list">{{jtem.name}}</el-menu-item>
+            <el-menu-item style="padding-left: 30px;" :index="i+'-'+j" @click="playOne(jtem.url)" v-for="(jtem,j) in item.list"> <i class="el-icon-caret-right"></i>{{jtem.name}}</el-menu-item>
           </el-menu-item-group>
         </el-submenu>
       </el-menu>
