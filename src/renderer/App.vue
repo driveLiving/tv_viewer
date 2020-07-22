@@ -1,75 +1,79 @@
 <template style="margin: 0px;">
-  <el-container style="height: 100%; border: 1px solid #eee">
+    <el-container style="height: 100%; border: 1px solid #eee">
 
 
-    <el-aside width="210px">
-<!--      <el-menu  :default-openeds="['1']" >-->
-<!--        <h3 style="margin-left: 20px;" @click="reloadList">节目列表</h3>-->
-<!--        <el-submenu :index="Math.random()+''"  v-for="(item,i) in playerList">-->
-<!--          <template slot="title"><i class="el-icon-menu"></i>{{item.groupName}}</template>-->
-<!--          <el-menu-item-group>-->
-<!--            <template slot="title">{{i+''}}</template>-->
-<!--            <el-menu-item :index="Math.random()+''" @click="playOne(jtem.url)" :data-url="jtem.url" v-for="(jtem,j) in item.list">{{jtem.name}}</el-menu-item>-->
-<!--          </el-menu-item-group>-->
-<!--        </el-submenu>-->
-<!--      </el-menu>-->
-      <el-menu class="el-menu-vertical-demo"  :unique-opened="true">
-        <h3 style="margin-left: 25px;" @click="reloadList(null)">节目列表</h3>
-        <el-submenu :index="(i+1)+''" v-for="(item,i) in playerList">
-          <template slot="title">
-            <i class="el-icon-location"></i>
+        <el-aside width="210px">
+            <!--      <el-menu  :default-openeds="['1']" >-->
+            <!--        <h3 style="margin-left: 20px;" @click="reloadList">节目列表</h3>-->
+            <!--        <el-submenu :index="Math.random()+''"  v-for="(item,i) in playerList">-->
+            <!--          <template slot="title"><i class="el-icon-menu"></i>{{item.groupName}}</template>-->
+            <!--          <el-menu-item-group>-->
+            <!--            <template slot="title">{{i+''}}</template>-->
+            <!--            <el-menu-item :index="Math.random()+''" @click="playOne(jtem.url)" :data-url="jtem.url" v-for="(jtem,j) in item.list">{{jtem.name}}</el-menu-item>-->
+            <!--          </el-menu-item-group>-->
+            <!--        </el-submenu>-->
+            <!--      </el-menu>-->
+            <el-menu class="el-menu-vertical-demo"  :unique-opened="true">
+                <h3 style="margin-left: 25px;" @click="reloadList(null)">节目列表</h3>
+                <el-submenu :index="(i+1)+''" v-for="(item,i) in playerList">
+                    <template slot="title">
+                        <i class="el-icon-location"></i>
 
-            <span slot="title">{{item.groupName}}</span>
-          </template>
-          <el-menu-item-group>
-            <span slot="title"></span>
-            <el-menu-item style="padding-left: 30px;" :index="i+'-'+j" @click="playOne(jtem.url)" v-for="(jtem,j) in item.list"> <i class="el-icon-caret-right"></i>{{jtem.name}}</el-menu-item>
-          </el-menu-item-group>
-        </el-submenu>
-      </el-menu>
-    </el-aside>
+                        <span slot="title">{{item.groupName}}</span>
+                    </template>
+                    <el-menu-item-group>
+                        <span slot="title"></span>
+                        <el-menu-item style="padding-left: 30px;" :index="i+'-'+j" @click="playOne(jtem.url)" v-for="(jtem,j) in item.list"> <i class="el-icon-caret-right"></i>{{jtem.name}}</el-menu-item>
+                    </el-menu-item-group>
+                </el-submenu>
+            </el-menu>
+        </el-aside>
 
-    <el-container>
-        <el-dialog
-                style="z-index:99999"
-                title="源文本"
-                :visible="dialogVisible"
-                width="70%"
-                :append-to-body="true"
-        center>
-            <el-input
-                    type="textarea"
-                    :autosize="{ minRows: 8, maxRows: 10}"
-                    placeholder="输入源(节目,链接)"
-                    v-model="textContent">
-            </el-input>
+        <el-container>
+            <el-dialog
+                    style="z-index:99999"
+                    title="源文本"
+                    :visible="dialogVisible"
+                    width="70%"
+                    :append-to-body="true"
+                    center>
+                <el-input
+                        type="textarea"
+                        :autosize="{ minRows: 8, maxRows: 10}"
+                        placeholder="输入源(节目,链接)"
+                        v-model="textContent">
+                </el-input>
 
-            <span slot="footer" class="dialog-footer">
+                <span slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="processM3u8Text">确 定</el-button>
           </span>
-        </el-dialog>
-      <el-main  v-loading="loading">
-        <section>
-<!--          <video style="width: 100%;" ref="video" controls></video>-->
-          <d-player ref="player" style="width: 100%;height: 100%;" :options="options"></d-player>
-        </section>
-      </el-main>
+            </el-dialog>
+            <el-main  v-loading="loading">
+                <section>
+                    <!--          <video style="width: 100%;" ref="video" controls></video>-->
+                    <!--          <d-player ref="player" style="width: 100%;height: 100%;" :options="options"></d-player>-->
+                    <div id="wrapper">
+                    </div>
+                </section>
+            </el-main>
+        </el-container>
     </el-container>
-  </el-container>
 </template>
 
 <script>
   let Hls = require('hls.js');
   import TitleBar from "./components/TitleBar.vue"
   import SideBar from "./components/SideBar.vue"
+  import flv from 'chimee-kernel-flv';
+  import hls from 'chimee-kernel-hls';
+
   import dPlayer from 'vue-dplayer'
   import 'vue-dplayer/dist/vue-dplayer.css'
   const ipcRenderer = require('electron').ipcRenderer;
   const fs = require('fs');
-
-
-
+  import Chimee from 'chimee';
+  let chimee = null;
 
   export default {
     components: {
@@ -118,7 +122,7 @@
     },
     mounted() {
       this.reloadList(null);
-      this.player = this.$refs.player.dp
+      //this.player = this.$refs.player.dp
 
 
 
@@ -139,10 +143,10 @@
           confirmButtonText: '确定',
           cancelButtonText: '取消'
         }).then(({ value }) => {
-            if(!value.startsWith("http")){
-              return;
-            }
-            thiz.reloadList(value);
+          if(!value.startsWith("http")){
+            return;
+          }
+          thiz.reloadList(value);
 
         }).catch(() => {
 
@@ -185,11 +189,11 @@
         if(url == null){
           url = 'http://dd.laigc.com:10080/linsongze/tv/raw/branch/master/m.txt?xxx='+Math.random();
         }else{
-            if(url.includes("?")){
-              url = url+'&xxx='+Math.random();
-            }else{
-              url=url+'?xxx='+Math.random();
-            }
+          if(url.includes("?")){
+            url = url+'&xxx='+Math.random();
+          }else{
+            url=url+'?xxx='+Math.random();
+          }
 
         }
         this.$axios.get(url).then(res => {
@@ -225,10 +229,25 @@
 
       },
       getStream(source) {
-        this.player.switchVideo({
-          url: source
-        })
-        this.player.play();
+        // this.player.switchVideo({
+        //   url: source
+        // })
+        // this.player.play();
+        if(chimee == null){
+          chimee = new Chimee({
+            wrapper: '#wrapper',
+            controls: true,
+            autoplay: false,
+            kernels: {
+              flv,
+              hls
+            }
+          });
+        }
+
+        chimee.load(source);
+        chimee.play();
+
 
       }
 
@@ -237,22 +256,22 @@
 </script>
 
 <style>
-  .el-header {
-    background-color: #B3C0D1;
-    color: #333;
-    line-height: 50px;
-  }
-  .el-main{
-    padding: 0px;
-  }
-  .el-menu-vertical-demo:not(.el-menu--collapse) {
-    width: 200px;
-    min-height: 400px;
-      height: 100%;
-  }
-  .el-aside {
-    color: #333;
-  }
-  html,body{margin:0;padding:0;height: 100%;}
+    .el-header {
+        background-color: #B3C0D1;
+        color: #333;
+        line-height: 50px;
+    }
+    .el-main{
+        padding: 0px;
+    }
+    .el-menu-vertical-demo:not(.el-menu--collapse) {
+        width: 200px;
+        min-height: 400px;
+        height: 100%;
+    }
+    .el-aside {
+        color: #333;
+    }
+    html,body{margin:0;padding:0;height: 100%;}
 
 </style>
