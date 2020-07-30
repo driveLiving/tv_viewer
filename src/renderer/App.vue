@@ -67,6 +67,7 @@
   import 'vue-dplayer/dist/vue-dplayer.css'
   const ipcRenderer = require('electron').ipcRenderer;
   const fs = require('fs');
+  var request = require("request");
 
 
 
@@ -134,7 +135,6 @@
         thiz.dialogVisible = true;
       });
       ipcRenderer.on('toInputUrl', function (event, message) {
-        console.log(111);
         thiz.$prompt('请输入在线源', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消'
@@ -149,7 +149,7 @@
         });
       });
       ipcRenderer.on('inputM3U8', function (event, message) {
-        console.log(111);
+
         thiz.$prompt('请输入M3U8', 'm3u8', {
           confirmButtonText: '确定',
           cancelButtonText: '取消'
@@ -157,7 +157,6 @@
           if(!value.startsWith("http")){
             return;
           }
-          console.log(value);
           thiz.playOne(value);
 
         }).catch(() => {
@@ -217,11 +216,14 @@
 
           }
         }
-        console.log(rs);
         this.playerList = rs;
       },
       playOne (url) {
-        this.getStream(url);
+        var thiz = this;
+        var r = request.get(url, function (err, res, body) {//获取最终重定向的地址再进行播放
+          url = res.request.uri.href;
+          thiz.getStream(url);
+        });
 
       },
       getStream(source) {
@@ -229,7 +231,6 @@
           url: source
         })
         this.player.play();
-
       }
 
     },
