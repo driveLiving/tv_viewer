@@ -234,9 +234,11 @@
         if (starting) {
           return;
         }
-        starting = true;
+        starting = true;//控制重重复点击
+        this.player.pause();
         var thiz = this;
         var r = request.get(url, function(err, res, body) {//获取最终重定向的地址再进行播放
+          console.log(url = res.request.uri.href)
           if (err == null) {
             url = res.request.uri.href
             thiz.getStream(url)

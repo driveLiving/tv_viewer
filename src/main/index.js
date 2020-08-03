@@ -102,8 +102,14 @@ function createWindow() {
   var menu = Menu.buildFromTemplate(application_menu);
   Menu.setApplicationMenu(menu);
 
+  //测试控制台输出
+  // var nodeConsole = require('console');
+  // var myConsole = new nodeConsole.Console(process.stdout, process.stderr);
+  // myConsole.log('Hello World!');
+  
+
   mainWindow.loadURL(winURL)
-  mainWindow.webContents.closeDevTools()
+  // mainWindow.webContents.closeDevTools()
   mainWindow.on("closed", () => {
     mainWindow = null
   })
