@@ -17,6 +17,8 @@ npm run dev
 
 如果环境没有错误的话，应该可以看到app已经被正常拉起了。
 
+![avatar](https://github.com/linsongze/tv_viewer/blob/master/example/1.png?raw=true)
+
 ### 打包
 
 在环境配置完毕之后，执行：
