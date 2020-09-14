@@ -39,7 +39,6 @@ function createWindow() {
     }
   });
   ipcMain.on("fullEvent",(event,message) => {
-    console.log("hhhhhhhhhhhhhhhhhhhhh");
     console.log(message);
     mainWindow.setMenuBarVisibility(!message);
 
