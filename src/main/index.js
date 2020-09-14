@@ -12,21 +12,6 @@ if (process.env.NODE_ENV !== "development") {
     .replace(/\\/g, "\\\\")
 }
 
-let myWindow = null
-
-const isSecondInstance = app.makeSingleInstance((commandLine, workingDirectory) => {
-  // Someone tried to run a second instance, we should focus our window.
-  if (myWindow) {
-    if (myWindow.isMinimized()) myWindow.restore()
-    myWindow.focus()
-  }
-})
-
-if (isSecondInstance) {
-  app.quit()
-}
-
-
 
 let mainWindow;
 
@@ -49,10 +34,17 @@ function createWindow() {
     width: sWidth,
     frame: true,
     webPreferences: {
-      webSecurity: false
+      webSecurity: false,
+      nodeIntegration: true, // 是否集成 Nodejs,把之前预加载的js去了，发现也可以运行
     }
   });
+  ipcMain.on("fullEvent",(event,message) => {
+    console.log("hhhhhhhhhhhhhhhhhhhhh");
+    console.log(message);
+    mainWindow.setMenuBarVisibility(!message);
 
+
+  });
   let application_menu = [
     {
       label: '直播源',
@@ -106,7 +98,7 @@ function createWindow() {
   // var nodeConsole = require('console');
   // var myConsole = new nodeConsole.Console(process.stdout, process.stderr);
   // myConsole.log('Hello World!');
-  
+
 
   mainWindow.loadURL(winURL)
   // mainWindow.webContents.closeDevTools()

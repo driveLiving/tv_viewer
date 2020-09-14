@@ -54,7 +54,9 @@
             <el-main v-loading="loading">
                 <section>
                     <!--          <video style="width: 100%;" ref="video" controls></video>-->
-                    <d-player ref="player" style="width: 100%;height: 100%;" :options="options"></d-player>
+<!--                    <d-player ref="player" style="width: 100%;height: 100%;" :options="options"></d-player>-->
+                    <div id="wrapper" style="width: 100%;height: 100%;">
+                    </div>
                 </section>
             </el-main>
         </el-container>
@@ -62,11 +64,9 @@
 </template>
 
 <script>
-  let Hls = require("hls.js")
-  import TitleBar from "./components/TitleBar.vue"
-  import SideBar from "./components/SideBar.vue"
-  import dPlayer from "vue-dplayer"
-  import "vue-dplayer/dist/vue-dplayer.css"
+
+  import Chimee from 'chimee';
+  import hls from 'chimee-kernel-hls';
 
   const ipcRenderer = require("electron").ipcRenderer
   const fs = require("fs")
@@ -77,7 +77,7 @@
 
   export default {
     components: {
-      dPlayer
+
     },
     props: {
       source: {
@@ -89,7 +89,7 @@
       return {
         textContent: "",
         dialogVisible: false,
-        player: null,
+         chimee:null,
         options: {
           video: {
             url: ""
@@ -128,7 +128,20 @@
     },
     mounted() {
       this.reloadList(null)
-      this.player = this.$refs.player.dp
+
+      this.chimee = new Chimee({
+        wrapper: '#wrapper',
+        controls: true,
+        autoplay: true,
+        kernels: {
+          hls
+        }
+      });
+      this.chimee.$watch('isFullscreen', (newVal, oldVal) => {
+            var isFull = !oldVal;
+            console.log(isFull);
+        ipcRenderer.send("fullEvent",isFull);
+      }, {deep: true});
 
 
       //触发输入框
@@ -235,7 +248,6 @@
           return;
         }
         starting = true;//控制重重复点击
-        this.player.pause();
         var thiz = this;
         var r = request.get(url, function(err, res, body) {//获取最终重定向的地址再进行播放
           console.log(url = res.request.uri.href)
@@ -250,10 +262,8 @@
 
       },
       getStream(source) {
-        this.player.switchVideo({
-          url: source
-        })
-        this.player.play()
+        this.chimee.load(source);
+        this.chimee.play(); // play!!
       }
 
     }
@@ -287,4 +297,22 @@
         height: 100%;
     }
 
+
+
+    container {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    video {
+        width: 100%;
+        height: 100%;
+        display: block;
+        background-color: #000;
+    }
+    video:focus,
+    video:active {
+        outline: none;
+    }
 </style>

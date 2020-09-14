@@ -60,6 +60,7 @@
     "chimee": "^0.12.0",
     "chimee-kernel-flv": "^1.4.11",
     "chimee-kernel-hls": "^1.3.2",
+    "chimee-plugin-popup": "0.0.8",
     "dplayer": "^1.26.0",
     "electron-prompt": "^1.5.1",
     "electron-store": "^2.0.0",
