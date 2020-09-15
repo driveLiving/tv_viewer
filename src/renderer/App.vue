@@ -51,10 +51,8 @@
                 <el-button type="primary" @click="processM3u8Text">确 定</el-button>
           </span>
             </el-dialog>
-            <el-main v-loading="loading">
+            <el-main v-loading="loading" style="background-color: #000000">
                 <section>
-                    <!--          <video style="width: 100%;" ref="video" controls></video>-->
-<!--                    <d-player ref="player" style="width: 100%;height: 100%;" :options="options"></d-player>-->
                     <div id="wrapper" style="width: 100%;height: 100%;">
                     </div>
                 </section>
