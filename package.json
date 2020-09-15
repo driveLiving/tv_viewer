@@ -1,6 +1,6 @@
 {
   "name": "tvshow",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "author": "tvshow",
   "description": "tv viewer",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "postinstall": "npm run lint:fix"
   },
   "build": {
-    "productName": "tvDesktopApp",
+    "productName": "tvshow",
     "appId": "com.tv.app",
     "directories": {
       "output": "build"
