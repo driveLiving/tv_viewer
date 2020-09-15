@@ -2,6 +2,7 @@ import { app,screen,Menu, BrowserWindow, ipcMain,MenuItem } from "electron"
 const ipcRenderer = require('electron').ipcRenderer;
 const {dialog} = require('electron');
 const clipboard = require('electron').clipboard;
+const electronLocalshortcut = require('electron-localshortcut');
 
 /**
  * Set `__static` path to static files in production
@@ -40,6 +41,16 @@ function createWindow() {
       webSecurity: false,
       nodeIntegration: true, // 是否集成 Nodejs,把之前预加载的js去了，发现也可以运行
     }
+  });
+  let m = false;
+  mainWindow.setMenuBarVisibility(m);
+
+  electronLocalshortcut.register(mainWindow, 'Ctrl+q', () => {
+    m = !m;
+    mainWindow.setMenuBarVisibility(m);
+  });
+  electronLocalshortcut.register(mainWindow, 'Ctrl+w', () => {
+    mainWindow.webContents.send("togglePlayListShow");
   });
 
   let application_menu = [
@@ -126,13 +137,24 @@ ipcMain.on("fullEvent",(event,message) => {
   mainWindow.setMenuBarVisibility(!message);
 });
 ipcMain.on("clickRightEvent",(event,message) => {
-  console.log(message);
   const menu = new Menu();
-  menu.append(new MenuItem({ label: '复制播放链接', click: () => {
-      clipboard.writeText(message.uu)
-      }
-    })
-  );
+  if(message.uu!=null) {
+    menu.append(new MenuItem({
+        label: '复制播放链接', click: () => {
+          clipboard.writeText(message.uu)
+        }
+      })
+    );
+  }else if(message.menuHideStatus!= null){
+    let name = message.menuHideStatus?"显示播放列表":"隐藏播放列表";
+    menu.append(new MenuItem({
+        label: name, click: () => {
+          mainWindow.webContents.send("togglePlayListShow")
+        }
+      })
+    );
+
+  }
   const win = BrowserWindow.fromWebContents(event.sender);
   menu.popup(win);
 });

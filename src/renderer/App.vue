@@ -2,7 +2,7 @@
     <el-container style="height: 100%; border: 1px solid #eee">
 
 
-        <el-aside width="210px">
+        <el-aside width="210px" v-show="showPlayList">
             <el-menu class="el-menu-vertical-demo" :unique-opened="true">
                 <h3 style="margin-left: 25px;" @click="reloadList(null)">节目列表</h3>
                 <el-submenu :index="(i+1)+''" v-for="(item,i) in playerList">
@@ -51,6 +51,7 @@
             </el-main>
         </el-container>
     </el-container>
+
 </template>
 
 <script>
@@ -77,9 +78,11 @@
     },
     data() {
       return {
+        showPlayList:true,
+
         textContent: "",
         dialogVisible: false,
-         chimee:null,
+        chimee:null,
         options: {
           video: {
             url: ""
@@ -110,19 +113,32 @@
         wrapper: '#wrapper',
         controls: true,
         autoplay: true,
+        autoload:false,
         kernels: {
           hls
         }
       });
+      //全屏事件
       this.chimee.$watch('isFullscreen', (newVal, oldVal) => {
             var isFull = !oldVal;
             console.log(isFull);
         ipcRenderer.send("fullEvent",isFull);
       }, {deep: true});
+      //视频右键
+      this.chimee.on('mousedown', evt => {
+            if(evt.button == 2){
+                console.log(evt,thiz.showPlayList);
+                ipcRenderer.send("clickRightEvent", { menuHideStatus:!thiz.showPlayList });
 
+            }
+      }, { target: 'container' });
 
+      const thiz = this;
+      //切换列表状态
+      ipcRenderer.on("togglePlayListShow", function(event, message) {
+        thiz.showPlayList = !thiz.showPlayList;
+      })
       //触发输入框
-      const thiz = this
       ipcRenderer.on("selectedFile", function(event, message) {
         const path = message.path[0]
         const data = fs.readFileSync(path, "utf-8")
