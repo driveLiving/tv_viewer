@@ -93,12 +93,6 @@ function createWindow() {
   var menu = Menu.buildFromTemplate(application_menu);
   Menu.setApplicationMenu(menu);
 
-  //测试控制台输出
-  // var nodeConsole = require('console');
-  // var myConsole = new nodeConsole.Console(process.stdout, process.stderr);
-  // myConsole.log('Hello World!');
-
-
   mainWindow.loadURL(winURL)
   // mainWindow.webContents.closeDevTools()
   mainWindow.on("closed", () => {
@@ -134,23 +128,3 @@ app.on("activate", () => {
     createWindow()
   }
 })
-
-/**
- * Auto Updater
- *
- * Uncomment the following code below and install `electron-updater` to
- * support auto updating. Code Signing with a valid certificate is required.
- * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
- */
-
-/*
-import { autoUpdater } from 'electron-updater'
-
-autoUpdater.on('update-downloaded', () => {
-  autoUpdater.quitAndInstall()
-})
-
-app.on('ready', () => {
-  if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
-})
- */

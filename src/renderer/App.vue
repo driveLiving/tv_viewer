@@ -3,16 +3,6 @@
 
 
         <el-aside width="210px">
-            <!--      <el-menu  :default-openeds="['1']" >-->
-            <!--        <h3 style="margin-left: 20px;" @click="reloadList">节目列表</h3>-->
-            <!--        <el-submenu :index="Math.random()+''"  v-for="(item,i) in playerList">-->
-            <!--          <template slot="title"><i class="el-icon-menu"></i>{{item.groupName}}</template>-->
-            <!--          <el-menu-item-group>-->
-            <!--            <template slot="title">{{i+''}}</template>-->
-            <!--            <el-menu-item :index="Math.random()+''" @click="playOne(jtem.url)" :data-url="jtem.url" v-for="(jtem,j) in item.list">{{jtem.name}}</el-menu-item>-->
-            <!--          </el-menu-item-group>-->
-            <!--        </el-submenu>-->
-            <!--      </el-menu>-->
             <el-menu class="el-menu-vertical-demo" :unique-opened="true">
                 <h3 style="margin-left: 25px;" @click="reloadList(null)">节目列表</h3>
                 <el-submenu :index="(i+1)+''" v-for="(item,i) in playerList">
@@ -104,19 +94,6 @@
             list: [
               { name: "CCTV1", url: "http://144.48.240.144:2019/SunTv.php?name=CCTV1HD" },
               { name: "CCTV2", url: "http://144.48.240.144:2019/SunTv.php?name=CCTV2HD" }
-            ]
-          },
-          {
-            groupName: "卫视",
-            list: [
-              {
-                name: "安徽卫视",
-                url: "http://101.71.255.229:6610/zjhs/2/10002/index.m3u8?virtualDomain=zjhs.live_hls.zte.com"
-              },
-              {
-                name: "北京卫视",
-                url: "http://101.71.255.229:6610/zjhs/2/10005/index.m3u8?virtualDomain=zjhs.live_hls.zte.com"
-              }
             ]
           }
         ]
