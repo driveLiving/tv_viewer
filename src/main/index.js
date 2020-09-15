@@ -28,12 +28,14 @@ function createWindow() {
    * Initial window options
    */
   let size = screen.getPrimaryDisplay().workAreaSize
-  let sWidth=size.width;
-  let sHeight=size.height;
+  let sWidth=size.width/3*2+100;
+  let sHeight=size.height/3*2-70;
   mainWindow = new BrowserWindow({
     height: sHeight,
     width: sWidth,
     frame: true,
+    vibrancy: 'ultra-dark', // 窗口模糊的样式
+
     webPreferences: {
       webSecurity: false,
       nodeIntegration: true, // 是否集成 Nodejs,把之前预加载的js去了，发现也可以运行
