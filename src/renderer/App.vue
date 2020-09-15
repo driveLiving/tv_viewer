@@ -8,18 +8,20 @@
                 <el-submenu :index="(i+1)+''" v-for="(item,i) in playerList">
                     <template slot="title">
                         <i class="el-icon-location"></i>
-
                         <span slot="title">{{item.groupName}}</span>
                     </template>
                     <el-menu-item-group>
                         <span slot="title"></span>
-                        <el-menu-item style="padding-left: 30px;" :index="i+'-'+j" @click="playOne(jtem.url)"
-                                      v-for="(jtem,j) in item.list"><i class="el-icon-caret-right"></i>{{jtem.name}}
+                        <el-menu-item  style="padding-left: 30px;" :index="i+'-'+j" @click="playOne(jtem.url)"
+                                       :uu="jtem.url"
+                                       @mouseup.native="itemMouseUp"
+                                       v-for="(jtem,j) in item.list"><i class="el-icon-caret-right"></i>{{jtem.name}}
                         </el-menu-item>
                     </el-menu-item-group>
                 </el-submenu>
             </el-menu>
         </el-aside>
+
 
         <el-container>
             <el-dialog
@@ -217,6 +219,17 @@
           }
         }
         this.playerList = rs
+      },
+      itemMouseUp(a){
+        var e = event || window.event;
+        let nType = e.button;
+
+        if (2 === nType) {
+
+          ipcRenderer.send("clickRightEvent",{uu:a.srcElement.getAttribute("uu")})
+        }
+        e.stopPropagation();
+
       },
       playOne(url) {
         if (starting) {

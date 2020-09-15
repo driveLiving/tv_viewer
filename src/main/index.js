@@ -1,6 +1,7 @@
-import { app,screen,Menu, BrowserWindow, ipcMain } from "electron"
+import { app,screen,Menu, BrowserWindow, ipcMain,MenuItem } from "electron"
 const ipcRenderer = require('electron').ipcRenderer;
 const {dialog} = require('electron');
+const clipboard = require('electron').clipboard;
 
 /**
  * Set `__static` path to static files in production
@@ -38,12 +39,7 @@ function createWindow() {
       nodeIntegration: true, // 是否集成 Nodejs,把之前预加载的js去了，发现也可以运行
     }
   });
-  ipcMain.on("fullEvent",(event,message) => {
-    console.log(message);
-    mainWindow.setMenuBarVisibility(!message);
 
-
-  });
   let application_menu = [
     {
       label: '直播源',
@@ -58,11 +54,8 @@ function createWindow() {
           label: '本地文件',
           click: () =>{
             let options = {
-              // See place holder 1 in above image
               title : "源文件",
-              // See place holder 3 in above image
               buttonLabel : "打开",
-              // See place holder 4 in above image
               filters :[
                 {name: '源文件', extensions: ['txt']}
               ],
@@ -70,8 +63,6 @@ function createWindow() {
             };
             let filePath = dialog.showOpenDialog(mainWindow, options)
             mainWindow.webContents.send("selectedFile",{path:filePath});
-
-
           }
         },
         {
@@ -128,3 +119,18 @@ app.on("activate", () => {
     createWindow()
   }
 })
+ipcMain.on("fullEvent",(event,message) => {
+  console.log(message);
+  mainWindow.setMenuBarVisibility(!message);
+});
+ipcMain.on("clickRightEvent",(event,message) => {
+  console.log(message);
+  const menu = new Menu();
+  menu.append(new MenuItem({ label: '复制播放链接', click: () => {
+      clipboard.writeText(message.uu)
+      }
+    })
+  );
+  const win = BrowserWindow.fromWebContents(event.sender);
+  menu.popup(win);
+});
