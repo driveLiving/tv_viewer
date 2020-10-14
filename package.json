@@ -18,8 +18,8 @@
     "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
     "postinstall": "npm run lint:fix",
-    "build:dev": "npm run build -- -c dev",
-    "build:prod": "npm run build -- -c production"
+    "build:dev": "npm run build",
+    "build:prod": "npm run build"
   },
   "build": {
     "productName": "tvshow",
